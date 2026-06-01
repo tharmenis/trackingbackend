@@ -17,7 +17,7 @@ server/
 └── tsconfig.json
 ```
 
-### Flow
+### The flow
 
 1. Client sends `POST /api/vehicles`
 2. Server authenticates with OpenRemote Keycloak (client_credentials grant)
