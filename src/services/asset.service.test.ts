@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseAsset, OpenRemoteAsset } from "./asset.service.js";
-import { VehicleStatus } from "../../../shared/types.js";
+import { VehicleStatus } from "../types.js";
 
 describe("parseAsset", () => {
   const NOW = 1700000000000;

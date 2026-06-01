@@ -1,5 +1,5 @@
 import axios from "axios";
-import { VehicleAsset, VehicleStatus, GeoPosition } from "../../../shared/types.js";
+import { VehicleAsset, VehicleStatus, GeoPosition } from "../types.js";
 import { AuthService } from "./auth.service.js";
 
 /** Threshold in ms — if last update is older than this, vehicle is offline */
