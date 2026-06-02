@@ -154,3 +154,87 @@ npm test
 - Ensure environment variables are set in your deployment environment
 - The `/health` endpoint can be used for load balancer health checks
 - CORS is enabled by default (all origins) — restrict in production if needed
+
+
+## Notifications & Alarms
+
+The middleware now owns push delivery for alarms and does not rely on OpenRemote push pipelines.
+
+### Dependency
+
+- `expo-server-sdk`
+
+### Push Token Endpoint
+
+#### `POST /users/push-token`
+
+Stores an Expo push token for the authenticated user.
+
+Authentication context:
+- Current implementation expects `x-user-id` request header (set by your auth gateway/backend).
+
+Request body:
+
+```json
+{
+  "expoPushToken": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+}
+```
+
+Responses:
+- `204` on success
+- `400` for missing/invalid token
+- `401` when `x-user-id` is missing
+
+Note: push tokens are currently stored in memory and reset on service restart.
+
+### Alarms API (Frontend)
+
+#### `GET /alarms`
+
+Returns alarms from OpenRemote.
+
+Optional query params:
+- `status` (example: `OPEN`)
+- `severity` (example: `HIGH`)
+
+#### `PUT /alarms/:id/acknowledge`
+
+Proxies acknowledge action to OpenRemote.
+
+#### `PUT /alarms/:id/resolve`
+
+Proxies resolve action to OpenRemote.
+
+### Alarms Poller
+
+The service runs a poller that:
+
+- polls OpenRemote alarms (`GET /api/{realm}/alarm`) for `OPEN` + `HIGH`
+- detects new alarms by ID
+- finds assigned user push token
+- sends Expo push notification
+
+Configuration:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ALARM_POLL_INTERVAL_MS` | No | Poll interval in milliseconds (default: `30000`) |
+
+### Push Payload
+
+High severity notifications include deep-link payload fields in `data`:
+
+```json
+{
+  "type": "alarm",
+  "alarmId": "<alarm-id>",
+  "severity": "HIGH",
+  "title": "<alarm-title>"
+}
+```
+
+### Open Items
+
+- Evaluate polling vs websocket/MQTT for lower-latency alarm delivery.
+- Finalize which vehicle rule conditions create alarms in OpenRemote When-Then rules.

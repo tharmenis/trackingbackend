@@ -18,3 +18,17 @@ export interface VehicleAsset {
   status: VehicleStatus;
   lastUpdated: number;
 }
+
+export type AlarmSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" | string;
+
+export type AlarmStatus = "OPEN" | "ACKNOWLEDGED" | "RESOLVED" | "CLOSED" | string;
+
+export interface Alarm {
+  id: string;
+  severity: AlarmSeverity;
+  status: AlarmStatus;
+  title: string;
+  description: string | null;
+  assignedUserId: string | null;
+  raw: Record<string, unknown>;
+}
