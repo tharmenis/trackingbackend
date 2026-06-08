@@ -57,13 +57,25 @@ export class AlarmService {
     const url = `${this.openRemoteUrl}/api/${this.realm}/alarm/${encodeURIComponent(id)}`;
     const status = action === "acknowledge" ? "ACKNOWLEDGED" : "RESOLVED";
 
-    const response = await axios.put(url, { status }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    // const response = await axios.put(url, { "status": status }, {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // });
 
-    return response.data;
+    // return response.data;
+
+    const currentAlarm = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
+
+const updatedAlarm = {
+  ...currentAlarm.data,
+  status: action === "acknowledge" ? "ACKNOWLEDGED" : "RESOLVED",
+};
+
+const response = await axios.put(url, updatedAlarm, {
+  headers: { Authorization: `Bearer ${token}` },
+});
+return response.data;
   }
 
   private parseAlarm(alarm: OpenRemoteAlarm): Alarm {

@@ -23,14 +23,23 @@ export function createAlarmsRouter(alarmService: AlarmService): Router {
   });
 
   router.put("/alarms/:id/acknowledge", async (req: Request<{ id: string }>, res: Response) => {
-    try {
-      const result = await alarmService.acknowledgeAlarm(req.params.id);
-      res.json(result ?? { status: "acknowledged" });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error acknowledging alarm";
-      res.status(502).json({ error: message });
-    }
-  });
+  try {
+    // console.log("Acknowledge alarm request", {
+    //   alarmId: req.params.id,
+    //   method: req.method,
+    //   url: req.originalUrl,
+    //   headers: req.headers,
+    //   body: req.body,
+    // });
+
+    const result = await alarmService.acknowledgeAlarm(req.params.id);
+    res.json(result ?? { status: "acknowledged" });
+  } catch (error) {
+    console.error("Acknowledge alarm failed", error);
+    const message = error instanceof Error ? error.message : "Unknown error acknowledging alarm";
+    res.status(502).json({ error: message });
+  }
+});
 
   router.put("/alarms/:id/resolve", async (req: Request<{ id: string }>, res: Response) => {
     try {

@@ -251,4 +251,9 @@ npm ci
 
 git add package.json package-lock.json
 git commit -m "Refresh lockfile"
-git push origin main
+git push origin main.
+
+
+curl -i -X PUT http://localhost:3000/alarms/208696/acknowledge
+curl -i -X PUT http://localhost:3000/alarms/208696/resolve
+curl -i http://localhost:3000/health

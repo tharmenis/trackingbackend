@@ -43,11 +43,17 @@ const alarmPoller = new AlarmPollerService({
   intervalMs: alarmPollIntervalMs,
 });
 
+app.use((req, _res, next) => {
+  console.log("Incoming request", req.method, req.originalUrl);
+  next();
+});
+
 app.use("/api", createVehiclesRouter(assetService));
 app.use(createUsersRouter(pushTokenStore));
 app.use(createAlarmsRouter(alarmService));
 
 app.get("/health", (_req, res) => {
+  
   res.json({ status: "ok" });
 });
 
