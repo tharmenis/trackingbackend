@@ -238,3 +238,17 @@ High severity notifications include deep-link payload fields in `data`:
 
 - Evaluate polling vs websocket/MQTT for lower-latency alarm delivery.
 - Finalize which vehicle rule conditions create alarms in OpenRemote When-Then rules.
+
+
+### Regenerate lockfile and push again
+
+git checkout main
+git pull --rebase origin main
+
+rm -rf node_modules package-lock.json
+npm install
+npm ci
+
+git add package.json package-lock.json
+git commit -m "Refresh lockfile"
+git push origin main

@@ -54,9 +54,10 @@ export class AlarmService {
 
   private async forwardAlarmAction(id: string, action: "acknowledge" | "resolve"): Promise<unknown> {
     const token = await this.authService.getToken();
-    const url = `${this.openRemoteUrl}/api/${this.realm}/alarm/${encodeURIComponent(id)}/${action}`;
+    const url = `${this.openRemoteUrl}/api/${this.realm}/alarm/${encodeURIComponent(id)}`;
+    const status = action === "acknowledge" ? "ACKNOWLEDGED" : "RESOLVED";
 
-    const response = await axios.put(url, undefined, {
+    const response = await axios.put(url, { status }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
