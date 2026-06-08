@@ -20,9 +20,13 @@ export class AlarmService {
   private readonly openRemoteUrl: string;
   private readonly realm: string;
 
-  constructor(authService: AuthService, config?: { openRemoteUrl: string; realm: string }) {
+  constructor(
+    authService: AuthService,
+    config?: { openRemoteUrl: string; realm: string },
+  ) {
     this.authService = authService;
-    this.openRemoteUrl = config?.openRemoteUrl || process.env.OPENREMOTE_URL || "";
+    this.openRemoteUrl =
+      config?.openRemoteUrl || process.env.OPENREMOTE_URL || "";
     this.realm = config?.realm || process.env.OPENREMOTE_REALM || "";
   }
 
@@ -52,30 +56,28 @@ export class AlarmService {
     return this.forwardAlarmAction(id, "resolve");
   }
 
-  private async forwardAlarmAction(id: string, action: "acknowledge" | "resolve"): Promise<unknown> {
+  private async forwardAlarmAction(
+    id: string,
+    action: "acknowledge" | "resolve",
+  ): Promise<unknown> {
     const token = await this.authService.getToken();
     const url = `${this.openRemoteUrl}/api/${this.realm}/alarm/${encodeURIComponent(id)}`;
     const status = action === "acknowledge" ? "ACKNOWLEDGED" : "RESOLVED";
 
-    // const response = await axios.put(url, { "status": status }, {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // });
+    const currentAlarm = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    // return response.data;
+    console.log(currentAlarm.data);
+    const updatedAlarm = {
+      ...currentAlarm.data,
+      status: action === "acknowledge" ? "ACKNOWLEDGED" : "RESOLVED",
+    };
 
-    const currentAlarm = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
-
-const updatedAlarm = {
-  ...currentAlarm.data,
-  status: action === "acknowledge" ? "ACKNOWLEDGED" : "RESOLVED",
-};
-
-const response = await axios.put(url, updatedAlarm, {
-  headers: { Authorization: `Bearer ${token}` },
-});
-return response.data;
+    const response = await axios.put(url, updatedAlarm, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
   }
 
   private parseAlarm(alarm: OpenRemoteAlarm): Alarm {
@@ -99,7 +101,11 @@ return response.data;
       return direct;
     }
 
-    if (alarm.assignee && typeof alarm.assignee.id === "string" && alarm.assignee.id.length > 0) {
+    if (
+      alarm.assignee &&
+      typeof alarm.assignee.id === "string" &&
+      alarm.assignee.id.length > 0
+    ) {
       return alarm.assignee.id;
     }
 
